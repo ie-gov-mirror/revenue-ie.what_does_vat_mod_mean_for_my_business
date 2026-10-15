@@ -1,162 +1,590 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Revenue VAT Modernisation Documentation</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VAT Modernisation – Revenue</title>
 
-    <link href="static/css/foundation.min.css" rel="stylesheet" />
-    <link href="static/css/vendor.min.css" rel="stylesheet" />
-    <link href="static/css/site.css" rel="stylesheet" />
-    <link href="static/css/myDocs.css" rel="stylesheet" />
-  </head>
+  <link href="static/fonts/Fira/fira.css" rel="stylesheet" />
 
-  <body class="revenue">
-    <div class="revenue">
-      <div id="top-bar">
-        <div class="row">
-          <div class="small-6 medium-5 large-7 columns logo">
-            <a
-              class="revenueLogo float-left"
-              title="Home"
-              href="http://www.revenue.ie"
-            >
-              <img
-                alt="revenue-Logo"
-                height="209"
-                width="437"
-                src="static/revenue-Logo-white.png"
-              />
-            </a>
-          </div>
-        </div>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Fira Sans', Helvetica, Arial, sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 1rem;
+      background: #f4f4f4;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Buttons and form controls do not inherit the page font by default – force the same font everywhere */
+    button, input, label { font-family: inherit; }
+
+    /* ── Header (green ribbon with centred guide title) ── */
+  header {
+  background: #025F63;
+  color: #fff;
+  /* Left/right padding matches the .container + .card edges:
+     900px max width, centred, plus the container's 20px padding */
+  padding: 16px max(20px, calc((100% - 900px) / 2 + 20px));
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 72px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.header-logo-link {
+  flex-shrink: 0;
+  display: inline-block;
+  line-height: 0;
+}
+.header-logo-link:focus-visible {
+  outline: 3px solid #00c6c6;
+  outline-offset: 2px;
+}
+
+.header-logo {
+  height: 72px;      /* was 48px: increase or decrease to taste */
+  width: auto;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  header { gap: 12px; }
+  .header-logo { height: 44px; }
+}
+
+    .header-title {
+  font-size: 1.15rem;
+  font-size: clamp(0.85rem, 1.8vw, 1.15rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  margin: 0;
+  text-align: left;
+  flex: 1;
+  min-width: 0; /* lets the text wrap beside the logo instead of pushing it */
+}
+
+    /* ── Main layout ── */
+    .container { max-width: 900px; margin: 40px auto 60px; padding: 0 20px; flex: 1; width: 100%; }
+
+    /* ── Card ── */
+    .card { background: #fff; border-top: 4px solid #025F63; padding: 36px 40px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); container-type: inline-size; }
+
+    /* ── Typography ── */
+    h1 {
+      font-size: 1.25rem; /* fallback for browsers without container query units */
+      font-size: clamp(0.95rem, 2.5cqw, 1.4rem); /* scales with card width so headings stay on one line */
+      font-weight: 700; color: #025F63; margin-bottom: 16px; line-height: 1.25;
+    }
+    h2 { font-size: 1.2rem; font-weight: 700; color: #025F63; margin-bottom: 12px; }
+    h3 { font-size: 1rem; font-weight: 700; color: #333; margin-bottom: 6px; }
+    p { line-height: 1.65; color: #333; margin-bottom: 12px; }
+    a.inline-link { color: #025F63; text-decoration: underline; font-weight: 700; }
+    a.inline-link:hover { color: #014a4d; }
+    a.inline-link:visited { color: #025F63; }
+
+    /* ── Uniform text size and line spacing inside every box (info, definition, outcome, yellow) ── */
+    .info-box, .definition-box, .outcome-panel, .warning-box { font-size: 1rem; line-height: 1.65; }
+
+    /* ── Info box (rounded rectangle) ── */
+    .info-box { background: #f0f7f7; border: 2px solid #025F63; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; }
+    .info-box p { margin-bottom: 0; }
+
+    /* ── Warning box (yellow, with icon) ── */
+    .warning-box { display: flex; align-items: flex-start; gap: 14px; background: #fff8e1; border-left: 4px solid #f0a500; padding: 14px 18px; margin: 16px 0; }
+    .warning-box svg { flex-shrink: 0; width: 32px; height: 32px; }
+    .warning-box p { margin-bottom: 0; color: #333; }
+    /* Rounded variant (used as a stand-alone rectangle in the EU B2B and All businesses outcomes) */
+    .warning-box-rounded { border: 2px solid #f0a500; border-radius: 12px; margin: 20px 0; }
+    /* Multi-paragraph / list content inside a warning box */
+    .warning-box .warning-text { flex: 1; }
+    .warning-box .warning-text p { margin-bottom: 0; }
+    .warning-box .warning-text p + p { margin-top: 12px; }
+    .warning-box .warning-text ul { padding-left: 20px; margin: 6px 0 0; line-height: 1.65; color: #333; }
+
+    /* ── Question block ── */
+    .question-block { margin-top: 24px; border-top: 1px solid #ddd; padding-top: 22px; }
+    .question-label { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; }
+    .question-note { font-size: 1rem; font-weight: 400; color: #1a1a1a; line-height: 1.6; margin-bottom: 12px; }
+
+    /* ── Radio options ── */
+    .radio-group { display: flex; flex-direction: column; gap: 10px; }
+    .radio-option { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 2px solid #ccc; cursor: pointer; transition: border-color 0.18s, background 0.18s; user-select: none; }
+    .radio-option:hover { border-color: #025F63; background: #f0f7f7; }
+    .radio-option input[type="radio"] { accent-color: #025F63; width: 18px; height: 18px; flex-shrink: 0; }
+    .radio-option.selected { border-color: #025F63; background: #e6f2f2; }
+    .radio-option label { font-size: 1rem; cursor: pointer; color: #1a1a1a; }
+
+    /* ── Definition box (always visible, light green, rounded rectangle) ── */
+    .definition-box { background: #e8f4ec; border: 2px solid #025F63; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; }
+    .definition-title { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+
+    /* ── Action panel ── */
+    .action-panel { background: #fff8e1; border-left: 4px solid #f0a500; padding: 16px 20px; margin: 20px 0; }
+    .action-panel h3 { color: #7a5200; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .action-panel ul { padding-left: 20px; margin-top: 6px; }
+    .action-panel ul li { line-height: 1.6; font-size: 0.93rem; margin-bottom: 4px; }
+
+    /* ── Outcome panel ── */
+    .outcome-panel { background: #f0f7f7; border: 2px solid #025F63; padding: 20px 24px; margin: 20px 0; }
+    .outcome-panel h2 { margin-bottom: 10px; }
+    /* Rounded variant (used for the separate rectangles in the outcome pages) */
+    .outcome-panel-rounded { border-radius: 12px; }
+
+    /* ── Phase badge ── */
+    .phase-badge { display: inline-block; background: #025F63; color: #fff; font-size: 0.78rem; font-weight: 700; padding: 2px 10px; margin-bottom: 8px; letter-spacing: 0.04em; }
+
+    /* ── Divider ── */
+    .section-divider { border: none; border-top: 2px solid #e0e0e0; margin: 32px 0; }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+    .btn { padding: 12px 28px; font-size: 0.97rem; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: background 0.18s, color 0.18s; letter-spacing: 0.02em; }
+    .btn-primary { background: #025F63; color: #fff; border-color: #025F63; }
+    .btn-primary:hover { background: #014a4d; border-color: #014a4d; }
+    .btn-secondary { background: #fff; color: #025F63; border-color: #025F63; }
+    .btn-secondary:hover { background: #f0f7f7; }
+
+    /* ── Error message ── */
+    .error-msg { color: #c0392b; font-size: 0.88rem; margin-top: 8px; display: none; }
+    .error-msg.visible { display: block; }
+
+    /* ── Footer (text removed – green ribbon retained at original height) ── */
+    footer { background: #025F63; color: rgba(255,255,255,0.8); text-align: center; padding: 16px; font-size: 0.8rem; flex-shrink: 0; min-height: 48px; }
+
+    /* ── Floating "Useful links" panel (outcome pages only) ── */
+.container { position: relative; }
+
+.prep-aside { display: none; margin-top: 20px; }
+.prep-aside.visible { display: block; }
+
+.prep-menu-box {
+  background: #f0f7f7;
+  border: 2px solid #025F63;
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.prep-menu summary {
+  list-style: none;            /* removes the default arrow */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #025F63;
+}
+.prep-menu summary::-webkit-details-marker { display: none; } /* Safari */
+.prep-menu summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #025F63;
+  border-bottom: 2px solid #025F63;
+  transform: rotate(45deg);
+  transition: transform 0.18s;
+  flex-shrink: 0;
+}
+.prep-menu[open] summary::after { transform: rotate(-135deg); }
+.prep-menu summary:focus-visible { outline: 3px solid #00c6c6; outline-offset: 4px; }
+
+.prep-menu ul { list-style: none; margin: 12px 0 0; padding: 0; }
+.prep-menu li + li { margin-top: 4px; }
+.prep-menu a {
+  display: block;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #025F63;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.prep-menu a:hover { background: #e6f2f2; border-color: #025F63; }
+.prep-menu a:focus-visible { outline: 3px solid #00c6c6; outline-offset: 2px; }
+
+/* Wide screens: float to the right of the card and stay in view while scrolling */
+@media (min-width: 1440px) {
+  .prep-aside {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;      /* just past the container; the card ends 20px inside it, so there is a 20px gap */
+    width: 240px;
+    margin-top: 0;
+  }
+  .prep-aside-inner { position: sticky; top: 20px; }
+}
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="header-logo-link" href="http://www.revenue.ie" title="Revenue home">
+    <img class="header-logo" src="static/revenue-Logo-white.png" alt="Revenue logo" />
+  </a>
+  <div class="header-title">Interactive Guide - What does VAT Modernisation mean for my business?</div>
+</header>
+
+<div class="container">
+  <div class="card">
+
+    <!-- ══════════════════════════════
+         STEP 2 — Q2: Registered for VAT in Ireland? (START OF FLOW)
+         Selecting Yes/No advances automatically
+    ══════════════════════════════ -->
+    <div id="step-2" class="step">
+      <h1>VAT registration in Ireland</h1>
+
+      <div class="info-box">
+        <p>This interactive guide is for businesses that are established in Ireland. If your business is not established you are not required to send or receive eInvoices in Phase One or Two of the domestic implementation of eInvoicing in Ireland.</p>
       </div>
-      <div class="hub-destination-row">
-        <div class="content row">
-          <div class="col-lg-12 col-md-12" id="overview-page">
-            <div id="overview">
-              <h2>Revenue VAT Modernisation Documentation</h2>
 
-              <div>
-                <p style="line-height: 180%">
-                  Here you will find links to Revenue VATMOD Documentation.
-                </p>
-                <p style="line-height: 180%">
-                  The Revenue Homepage can be viewed <a target="_blank" rel="noopener" href="http://www.revenue.ie" >here</a>.
-                </p>
-              </div>
-            </div>
-            <div>
-              <div class="row">
-                <div class="col-lg-12 col-md-12">
-                  <div id="show-data">
-                    <!-- Container  -->
-                    <div>
-                      <div class="section-header margin-btm">
-                        <a style="text-decoration: none">
-                          <h3>Documentation List</h3>
-                        </a>
-                      </div>
-
-                      <div
-                        class="col-xs-12 margin-btm"
-                        style="padding: 0.3rem !important"
-                      >
-                        <div class="bold">
-                          <div class="col-xs-6 col-xxs-5">
-                            <strong>Title</strong>
-                          </div>
-                          <div
-                            class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xxs-5"
-                          >
-                            <strong>Document Link</strong>
-                          </div>
-                          <div
-                            class="col-lg-3 col-md-3 col-sm-3 col-xs-1 col-xxs-2"
-                            style="padding: 0rem !important"
-                          >
-                            <strong>Type</strong>
-                          </div>
-                        </div>
-                      </div>
-                    <!-- meeting cards -->
-                      <div
-                        class="card"
-                        style="font-size: 1.2rem; margin-bottom: 1rem"
-                      >
-                        <div class="col-xs-6 col-xxs-5">Peppol</div>
-                        <div
-                          class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xxs-5"
-                        >
-                          <a
-                            href="http://www.revenue.ie"
-                            >View</a
-                          >
-                        </div>
-                        <div
-                          class="col-lg-3 col-md-3 col-sm-3 col-xs-1 col-xxs-2"
-                          style="padding: 0rem !important"
-                        >
-                          PDF
-                        </div>
-                      </div>
-                      <div
-                        class="card"
-                        style="font-size: 1.2rem; margin-bottom: 1rem"
-                      >
-                        <div class="col-xs-6 col-xxs-5">VAT3</div>
-                        <div
-                          class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xxs-5"
-                        >
-                          <a
-                            href="http://www.revenue.ie"
-                            >View</a
-                          >
-                        </div>
-                        <div
-                          class="col-lg-3 col-md-3 col-sm-3 col-xs-1 col-xxs-2"
-                          style="padding: 0rem !important"
-                        >
-                          PDF
-                        </div>
-                      </div>
-                      <div
-                        class="card"
-                        style="font-size: 1.2rem; margin-bottom: 1rem"
-                      >
-                        <div class="col-xs-6 col-xxs-5">VAT RTR</div>
-                        <div
-                          class="col-lg-3 col-md-3 col-sm-3 col-xs-3 col-xxs-5"
-                        >
-                          <a
-                            href="http://www.revenue.ie"
-                            >View</a
-                          >
-                        </div>
-                        <div
-                          class="col-lg-3 col-md-3 col-sm-3 col-xs-1 col-xxs-2"
-                          style="padding: 0rem !important"
-                        >
-                          PDF
-                        </div>
-                      </div>
-                      <!-- Next Meeting Card to be added here -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="support">
-                <h2>Additional information</h2>
-                <p>
-                    The information in these documents is provided as a guide only and is not professional advice, including legal
-                    advice. It should not be assumed that the guidance is comprehensive or that it provides a definitive
-                    answer in every case.
-                </p>
-              </div>
-            </div>
+      <div class="question-block" style="margin-top:0;border-top:none;padding-top:0;">
+        <div class="question-label">Are you registered for VAT in Ireland?</div>
+        <div class="radio-group" id="q2-group">
+          <div class="radio-option" onclick="selectOption('q2','yes',this)">
+            <input type="radio" name="q2" id="q2-yes" value="yes"/>
+            <label for="q2-yes">Yes</label>
+          </div>
+          <div class="radio-option" onclick="selectOption('q2','no',this)">
+            <input type="radio" name="q2" id="q2-no" value="no"/>
+            <label for="q2-no">No</label>
           </div>
         </div>
+        <div class="error-msg" id="q2-error">Please select an option to continue.</div>
       </div>
     </div>
-  </body>
+
+    <!-- ══════════════════════════════
+         STEP 3 — Q3: Large Corporates?
+    ══════════════════════════════ -->
+    <div id="step-3" class="step" style="display:none;">
+      <h1>Is your business managed by Large Corporates Division?</h1>
+
+      <div class="definition-box" id="def-largecorp" role="region" aria-labelledby="def-largecorp-title">
+        <div class="definition-title" id="def-largecorp-title">What is a 'Large Corporate' for eInvoicing purposes?</div>
+        For Phase One, a business will be considered a large corporate for eInvoicing purposes if they are:
+        <ul style="padding-left:18px;margin-top:6px;">
+          <li>a VAT-registered business whose tax affairs are managed by Large Corporates Division in Revenue on 1 January 2027; and</li>
+          <li>established, or have a fixed establishment, in Ireland.</li>
+        </ul>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">Is your business's tax affairs managed by the Large Corporates Division in Revenue?</div>
+        <div class="radio-group" id="q3-group">
+          <div class="radio-option" onclick="selectOption('q3','yes',this)">
+            <input type="radio" name="q3" id="q3-yes" value="yes"/>
+            <label for="q3-yes">Yes</label>
+          </div>
+          <div class="radio-option" onclick="selectOption('q3','no',this)">
+            <input type="radio" name="q3" id="q3-no" value="no"/>
+            <label for="q3-no">No</label>
+          </div>
+        </div>
+        <div class="error-msg" id="q3-error">Please select an option to continue.</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo(2)">&larr; Back</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         STEP 4 — Q4: Intra EU B2B?
+    ══════════════════════════════ -->
+    <div id="step-4" class="step" style="display:none;">
+      <h1>Does your business engage in cross-border EU B2B trade?</h1>
+
+      <div class="info-box">
+        <p>Cross-border EU B2B trade refers to the acquisition and supply of goods and services between VAT-registered businesses across EU Member States, where the transaction benefits from zero-rate goods or reverse charge services VAT arrangements.</p>
+      </div>
+
+      <div class="question-block">
+        <div class="question-label">Does your business engage in Intra-EU B2B trade that benefit from zero-rate goods or reverse charge services VAT arrangements?</div>
+        <div class="radio-group" id="q4-group">
+          <div class="radio-option" onclick="selectOption('q4','yes',this)">
+            <input type="radio" name="q4" id="q4-yes" value="yes"/>
+            <label for="q4-yes">Yes</label>
+          </div>
+          <div class="radio-option" onclick="selectOption('q4','no',this)">
+            <input type="radio" name="q4" id="q4-no" value="no"/>
+            <label for="q4-no">No</label>
+          </div>
+        </div>
+        <div class="error-msg" id="q4-error">Please select an option to continue.</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo(3)">&larr; Back</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         OUTCOME A — eInvoice Reception Only
+         Split into three separate rounded rectangles:
+         1) Result statement, 2) Yellow information box, 3) How to prepare
+    ══════════════════════════════════════════════════════ -->
+    <div id="outcome-a" class="step" style="display:none;">
+      <h1>All businesses receiving eInvoices</h1>
+
+      <!-- Rectangle 1: result statement -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <p style="margin-bottom:0;">Based on the answers you have provided, your business will be required to receive eInvoices from 1 November 2028. This requirement applies to your business regardless of its VAT registration status. The definition of a business is available on the <a class="inline-link" href="https://live-preview.revenuedomain.ie/en/corporate/consultations-and-submissions/modernising-vat/einvoicing/all-businesses/index.aspx" target="_blank" rel="noopener noreferrer">All businesses</a> page of the Revenue website.</p>
+      </div>
+
+      <!-- Rectangle 2: yellow information box -->
+      <div class="warning-box warning-box-rounded">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#f0a500" stroke="#7a5200" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M10 12.5l2-2.5 2 2.5M12 10v6" fill="none" stroke="#7a5200" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.5 20.5h5M10.5 22.5h3" stroke="#7a5200" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <p>If your only requirement during these phases is to receive eInvoices, you do not need to take any action at this time. More guidance will be provided in due course.</p>
+      </div>
+
+      <!-- Rectangle 3: How to prepare -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <h3 style="font-size:1rem;color:#333;margin-bottom:6px;">How to prepare</h3>
+        <p style="margin-bottom:0;">As your business is required to receive eInvoices from 1 November 2028, you should:</p>
+        <ul style="padding-left:20px;margin:6px 0 0;line-height:1.65;">
+          <li>stay informed. Join our mailing list to receive the latest updates and insights on eInvoicing and VAT Modernisation.</li>
+          <li>ensure you have an active digital certificate for Revenue Online Services (ROS). Revenue will use this channel for direct business communications.</li>
+          <li>attend our communication events, e.g. webinars, which will be announced on www.revenue.ie.</li>
+          <li>review your current invoicing or accounting systems.</li>
+          <li>plan for any necessary updates or upgrades.</li>
+        </ul>
+      </div>
+
+      <hr class="section-divider"/>
+      <div class="btn-row" style="margin-top:24px;">
+        <button class="btn btn-secondary" onclick="goBackFromOutcome()">&larr; Back</button>
+        <button class="btn btn-primary" onclick="restart()">&#x21BA; Start again</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         OUTCOME B — Large Corporate (Phase 1)
+         Split into four separate rounded rectangles:
+         1) Result statement, 2) Yellow information box (light bulb) with obligations,
+         3) How to prepare, 4) ViDA note
+    ══════════════════════════════════════════════════════ -->
+    <div id="outcome-b" class="step" style="display:none;">
+      <h1>VAT registered large corporates</h1>
+
+      <!-- Rectangle 1: result statement -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <p style="margin-bottom:0;">Based on the answers you have provided, your business is a VAT registered large corporate.</p>
+      </div>
+
+      <!-- Rectangle 2: yellow information box with light bulb icon -->
+      <div class="warning-box warning-box-rounded">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#f0a500" stroke="#7a5200" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M10 12.5l2-2.5 2 2.5M12 10v6" fill="none" stroke="#7a5200" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.5 20.5h5M10.5 22.5h3" stroke="#7a5200" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <div class="warning-text">
+          <p>If your tax affairs continue to be managed by Large Corporates Division in Revenue on 1 January 2027, from 1 November 2028 you will be required to:</p>
+          <ul>
+            <li>issue structured eInvoices for taxable domestic business to business (B2B) transactions.</li>
+            <li>report a subset of the relevant eInvoice data to Revenue in real time for those domestic transactions.</li>
+            <li>ensure your business can receive eInvoices from your suppliers.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Rectangle 3: How to prepare -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <h3 style="font-size:1rem;color:#333;margin-bottom:6px;">How to prepare</h3>
+        <p style="margin-bottom:0;">To prepare your business for Phase One, you should:</p>
+        <ul style="padding-left:20px;margin:6px 0 0;line-height:1.65;">
+          <li>stay informed. Join our mailing list to receive the latest updates and insights on eInvoicing and VAT Modernisation.</li>
+          <li>ensure you have an active digital certificate for Revenue Online Services. Revenue will use this channel for direct business communications.</li>
+          <li>attend our communication events, e.g. webinars, which will be announced on this hub.</li>
+          <li>review your current invoicing or accounting systems.</li>
+          <li>ensure that you have all relevant data required for the businesses in your supply chain.</li>
+          <li>engage with your software provider to discuss technical readiness.</li>
+          <li>ensure that your internal teams and departments understand the new requirements.</li>
+          <li>plan for any necessary updates or upgrades.</li>
+        </ul>
+      </div>
+
+      <!-- Rectangle 4: ViDA note -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <p style="margin-bottom:0;">If your business is also engaged in cross-border EU business to business (B2B) trade, you will also be impacted by the introduction of the European Union’s VAT in the Digital Age (ViDA) initiative. Ensure you stay informed on the ViDA requirements as they are announced.</p>
+      </div>
+
+      <hr class="section-divider"/>
+      <div class="btn-row" style="margin-top:24px;">
+        <button class="btn btn-secondary" onclick="goTo(3)">&larr; Back</button>
+        <button class="btn btn-primary" onclick="restart()">&#x21BA; Start again</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         OUTCOME C — Cross-Border EU B2B (Phase 2 & 3)
+         Split into three separate rounded rectangles:
+         1) Result statement, 2) Yellow information box, 3) How to prepare
+    ══════════════════════════════════════════════════════ -->
+    <div id="outcome-c" class="step" style="display:none;">
+      <h1>VAT registered business with EU business to business (B2B) trade</h1>
+
+      <!-- Rectangle 1: result statement -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <p style="margin-bottom:0;">Based on the answers you have provided, your business is a VAT registered business engaged in cross-border EU B2B trade (zero-rated).</p>
+      </div>
+
+      <!-- Rectangle 2: yellow information box -->
+      <div class="warning-box warning-box-rounded">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 2a7 7 0 0 0-4 12.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26A7 7 0 0 0 12 2z" fill="#f0a500" stroke="#7a5200" stroke-width="1.2" stroke-linejoin="round"/>
+          <path d="M10 12.5l2-2.5 2 2.5M12 10v6" fill="none" stroke="#7a5200" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M9.5 20.5h5M10.5 22.5h3" stroke="#7a5200" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <div class="warning-text">
+          <p>The domestic obligation will extend to all VAT-registered businesses engaged in taxable cross-border EU B2B trade, who benefit from the zero-rate goods or reverse charge services VAT arrangements.</p>
+          <p>From 1 November 2028 you are required to:</p>
+          <ul>
+            <li>ensure your business can receive eInvoices from other Irish businesses.</li>
+          </ul>
+          <p style="margin-top:12px;">From 1 November 2029 you are required to:</p>
+          <ul>
+            <li>send eInvoices to Irish business customers</li>
+            <li style="list-style:none;">and</li>
+            <li>report a subset of relevant data from the eInvoice to Revenue.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Rectangle 3: How to prepare -->
+      <div class="outcome-panel outcome-panel-rounded">
+        <h3 style="font-size:1rem;color:#333;margin-bottom:6px;">How to prepare</h3>
+        <p style="margin-bottom:0;">As your business is required to receive eInvoices from 1 November 2028 and issue eInvoices from 1 November 2029, you should:</p>
+        <ul style="padding-left:20px;margin:6px 0 0;line-height:1.65;">
+          <li>stay informed. Join our mailing list to receive the latest updates and insights on eInvoicing and VAT Modernisation.</li>
+          <li>ensure you have an active digital certificate for Revenue Online Services. Revenue will use this channel for direct business communications.</li>
+          <li>attend our communication events, e.g. webinars, which will be announced on this hub.</li>
+          <li>review your current invoicing or accounting systems.</li>
+          <li>ensure that you have all relevant data required for the businesses in your supply chain.</li>
+          <li>engage with your software provider to discuss technical readiness.</li>
+          <li>ensure that your internal teams and departments understand the new requirements.</li>
+          <li>plan for any necessary updates or upgrades.</li>
+        </ul>
+      </div>
+
+      <hr class="section-divider"/>
+      <div class="btn-row" style="margin-top:24px;">
+        <button class="btn btn-secondary" onclick="goTo(4)">&larr; Back</button>
+        <button class="btn btn-primary" onclick="restart()">&#x21BA; Start again</button>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <!-- Floating links panel (shown on outcome pages only) -->
+  <aside id="prep-aside" class="prep-aside visible" aria-label="Related links">
+    <div class="prep-aside-inner">
+      <div class="prep-menu-box">
+        <details class="prep-menu">
+          <summary>Useful links</summary>
+          <ul>
+                        <li><a href="https://live-preview.revenuedomain.ie/en/corporate/consultations-and-submissions/modernising-vat/einvoicing/index.aspx" target="_blank" rel="noopener noreferrer">eInvoicing hub</a></li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /container -->
+
+<footer aria-hidden="true"></footer>
+
+<script>
+  // q2 = registered for VAT in Ireland? (first question)
+  // q3 = managed by Large Corporates Division?
+  // q4 = Intra-EU B2B trade (zero-rate goods / reverse charge services)?
+  const answers = { q2: null, q3: null, q4: null };
+  const STEPS = ['step-2','step-3','step-4','outcome-a','outcome-b','outcome-c'];
+
+  // Selecting Yes/No on a question automatically runs that question's routing handler
+  const ADVANCE_DELAY_MS = 250; // short pause so the selection highlight is visible
+  let advanceTimer = null;
+
+  function showStep(id) {
+    clearTimeout(advanceTimer); // cancel any pending auto-advance (e.g. user clicked Back)
+    STEPS.forEach(s => document.getElementById(s).style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('prep-aside').classList.toggle('visible', true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goTo(n) { showStep('step-' + n); }
+
+  function selectOption(q, value, el) {
+    answers[q] = value;
+    document.getElementById(q+'-group').querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type="radio"]').checked = true;
+    document.getElementById(q+'-error').classList.remove('visible');
+
+    // Auto-advance to the next page (single pending timer prevents double navigation)
+    clearTimeout(advanceTimer);
+    advanceTimer = setTimeout(function () { NEXT_HANDLER[q](); }, ADVANCE_DELAY_MS);
+  }
+
+  // Q2: Registered for VAT in Ireland? No -> Outcome A | Yes -> Q3
+  function handleQ2() {
+    if (!answers.q2) { document.getElementById('q2-error').classList.add('visible'); return; }
+    answers.q2 === 'no' ? showOutcome('a') : showStep('step-3');
+  }
+  // Q3: Large Corporates Division? Yes -> Outcome B | No -> Q4
+  function handleQ3() {
+    if (!answers.q3) { document.getElementById('q3-error').classList.add('visible'); return; }
+    answers.q3 === 'yes' ? showOutcome('b') : showStep('step-4');
+  }
+  // Q4: Intra-EU B2B? Yes -> Outcome C | No -> Outcome A
+  function handleQ4() {
+    if (!answers.q4) { document.getElementById('q4-error').classList.add('visible'); return; }
+    answers.q4 === 'yes' ? showOutcome('c') : showOutcome('a');
+  }
+
+  const NEXT_HANDLER = { q2: handleQ2, q3: handleQ3, q4: handleQ4 };
+
+  function showOutcome(letter) {
+    showStep('outcome-' + letter);
+  }
+
+  // Outcome A can be reached from Q2 (No) or Q4 (No) — check in flow order
+  function goBackFromOutcome() {
+    if (answers.q2 === 'no') goTo(2);
+    else goTo(4);
+  }
+
+  function restart() {
+    answers.q2 = answers.q3 = answers.q4 = null;
+    ['q2','q3','q4'].forEach(q => {
+      const g = document.getElementById(q+'-group');
+      if (g) {
+        g.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+        g.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      }
+      const e = document.getElementById(q+'-error');
+      if (e) e.classList.remove('visible');
+    });
+    showStep('step-2');
+  }
+</script>
+</body>
 </html>
